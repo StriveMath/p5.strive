@@ -1,6 +1,8 @@
 {
   "name": "strive-lib",
   "version": "0.0.0",
+  "main": "./dist/Strive.umd.js",
+  "module": "./dist/Strive.es.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -8,5 +10,15 @@
   },
   "devDependencies": {
     "vite": "^2.5.1"
+  },
+  "dependencies": {
+    "mathjs": "^9.4.4",
+    "p5": "^1.4.0"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/Strive.umd.js",
+      "require": "./dist/Strive.es.js"
+    }
   }
 }
