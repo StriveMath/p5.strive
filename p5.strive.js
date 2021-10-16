@@ -418,6 +418,10 @@ p5.prototype._updateNextMouseCoords = function(e) {
       this.height,
       e
     );
+    if (this._coordinateMode === this.RIGHT_HAND) {
+      mousePos.y = this.height - mousePos.y;
+      mousePos.winY = this.height - mousePos.winY;
+    }
     this._setProperty('movedX', e.movementX);
     this._setProperty('movedY', e.movementY);
     this._setProperty('mouseX', mousePos.x);
@@ -430,15 +434,6 @@ p5.prototype._updateNextMouseCoords = function(e) {
     this._updateMouseCoords();
     this._setProperty('_hasMouseInteracted', true);
   }
-};
-
-p5.prototype._updateMouseCoords = function() {
-  this._setProperty('pmouseX', this.mouseX);
-  this._setProperty('pmouseY', this.mouseY);
-  this._setProperty('pwinMouseX', this.winMouseX);
-  this._setProperty('pwinMouseY', this.winMouseY);
-
-  this._setProperty('_pmouseWheelDeltaY', this._mouseWheelDeltaY);
 };
 
 function getMousePos(canvas, w, h, evt) {
@@ -461,7 +456,3 @@ function getMousePos(canvas, w, h, evt) {
     id: evt.identifier
   };
 }
-
-// ====================================
-// 
-// ====================================
