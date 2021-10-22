@@ -505,6 +505,10 @@ p5.prototype.createMovableCircle = function (x, y, d) {
   return new MovableCircle(this, x, y, d);
 };
 
+p5.prototype.unixTime = function () {
+  return Math.round(Date.now() / 1000);
+};
+
 // ====================================
 // Mouse Coordinates
 // ====================================
