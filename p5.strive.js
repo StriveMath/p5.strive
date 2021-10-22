@@ -632,3 +632,34 @@ p5.prototype.createCanvas = function (w, h, renderer) {
   this._renderer._applyDefaults();
   return this._renderer;
 };
+
+p5.Element.prototype.position = function () {
+  if (arguments.length === 0) {
+    return { x: this.elt.offsetLeft, y: this.elt.offsetTop };
+  } else {
+    let positionType = "absolute";
+    if (
+      arguments[2] === "static" ||
+      arguments[2] === "fixed" ||
+      arguments[2] === "relative" ||
+      arguments[2] === "sticky" ||
+      arguments[2] === "initial" ||
+      arguments[2] === "inherit"
+    ) {
+      positionType = arguments[2];
+    }
+    this.elt.style.position = positionType;
+    this.elt.style.left = arguments[0] + "px";
+    let y;
+    if (this._pInst._coordinateMode === this._pInst.RIGHT_HAND) {
+      y = this._pInst.height - arguments[1];
+      this.elt.style.top = y + "px";
+    } else {
+      y = arguments[1];
+      this.elt.style.top = y + "px";
+    }
+    this.x = arguments[0];
+    this.y = y;
+    return this;
+  }
+};
