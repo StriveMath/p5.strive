@@ -303,14 +303,6 @@ p5.prototype.registerMethod("post", function () {
   }
 });
 
-// p5.prototype.registerMethod('pre', function() {
-//   if (this._renderer.isP3D) {
-//     this._basisMatrix = math.identity(4);
-//   } else {
-//     this._basisMatrix = math.identity(3);
-//   }
-// });
-
 // ====================================
 // Strive functions
 // ====================================
@@ -335,42 +327,61 @@ p5.prototype.drawTickAxes = function (
   yoffset = 0
 ) {
   this.push();
+  this.textAlign(this.CENTER, this.CENTER);
   this.translate(xoffset, yoffset);
-  for (let i = 0; i < this.height; i += spacing) {
-    //vertical tickmarks
+  for (let y = 0; y < this.height; y += spacing) {
+    // tickmarks
     this.stroke(lineColor);
     this.strokeWeight(thickness);
-    this.line(5, i, -5, i);
-    this.line(5, -i, -5, -i);
+    this.line(5, y, -5, y);
+    this.line(5, -y, -5, -y);
 
-    //horizontal tickmarks
-    this.line(i, +5, i, -5);
-    this.line(-i, +5, -i, -5);
+    // labels
+    if (y !== 0) {
+      this.fill("white");
+      this.noStroke();
+      this.responsiveText(y, 2 * this.textSize(), y);
+      this.responsiveText(-y, 2 * this.textSize(), -y);
+    }
 
-    this.fill("white");
-    this.noStroke();
-
-    this.responsiveText(i, 16, i);
-    this.responsiveText(-i, 16, -i);
-
-    this.responsiveText(i, i, 16);
-    this.responsiveText(-i, -i, 16);
-
+    // gridlines
     this.strokeWeight(0.25);
     this.stroke(this.color("rgba(255,255,255,0.6)"));
-    this.line(i, -this.height, i, this.height);
-    this.line(-i, -this.height, -i, this.height);
+    this.line(-this.width, y, this.width, y);
+    this.line(-this.width, -y, this.width, -y);
+  }
 
-    this.line(-this.width, i, this.width, i);
-    this.line(-this.width, -i, this.width, -i);
+  for (let x = 0; x < this.width; x += spacing) {
+    // tickmarks
+    this.stroke(lineColor);
+    this.strokeWeight(thickness);
+    this.line(x, +5, x, -5);
+    this.line(-x, +5, -x, -5);
+
+    // labels
+    if (x !== 0) {
+      this.fill("white");
+      this.noStroke();
+      this.responsiveText(x, x, 1.5 * this.textSize());
+      this.responsiveText(-x, -x, 1.5 * this.textSize());
+    }
+
+    // gridlines
+    this.strokeWeight(0.25);
+    this.stroke(this.color("rgba(255,255,255,0.6)"));
+    this.line(x, -this.height, x, this.height);
+    this.line(-x, -this.height, -x, this.height);
   }
   this.stroke(lineColor);
   this.strokeWeight(5);
-  //horizontal line
+  // x-axis
   this.line(-this.width, 0, this.width, 0);
-  //vertical line
+  // y-axis
   this.line(0, this.height, 0, -this.height);
-
+  // origin
+  this.fill("white");
+  this.noStroke();
+  this.responsiveText(0, this.textSize(), this.textSize());
   this.pop();
 };
 

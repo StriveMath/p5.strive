@@ -1,12 +1,12 @@
 from p5 import *
 
 def setup():
-  createCanvas(400, 400)
+  createCanvas(600, 400)
   global s, p
   s = createSlider(0, 255, 100)
   s.position(205, 300)
   s.style('width', '100px')
-  p = createMovableCircle(200, 100, 25)
+  p = createMovableCircle(500, 100, 25)
 
 def draw():
   background(s.value())
