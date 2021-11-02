@@ -641,6 +641,10 @@ p5.prototype.createCanvas = function (w, h, renderer) {
   }
   this._renderer.resize(w, h);
   this._renderer._applyDefaults();
+
+  if (this._coordinateMode === this.RIGHT_HAND) {
+    this.rightHanded();
+  }
   return this._renderer;
 };
 
