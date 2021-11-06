@@ -499,8 +499,14 @@ class MovableCircle {
 
     const tmouse = {};
     const inverse = math.inv(this.pInst._basisMatrix);
-    tmouse.x = mouse.x * inverse.get([0, 0]) + mouse.y * inverse.get([1, 0]) + 1 * inverse.get([2, 0]);
-    tmouse.y = mouse.x * inverse.get([0, 1]) + mouse.y * inverse.get([1, 1]) + 1 * inverse.get([2, 1]);
+    tmouse.x =
+      mouse.x * inverse.get([0, 0]) +
+      mouse.y * inverse.get([1, 0]) +
+      1 * inverse.get([2, 0]);
+    tmouse.y =
+      mouse.x * inverse.get([0, 1]) +
+      mouse.y * inverse.get([1, 1]) +
+      1 * inverse.get([2, 1]);
 
     return tmouse;
   }
