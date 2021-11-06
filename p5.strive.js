@@ -69,21 +69,23 @@ p5.prototype._angleMode = p5.prototype.DEGREES;
 p5.prototype.translate = function (x, y, z) {
   p5._validateParameters("translate", arguments);
   if (this._renderer.isP3D) {
-    const transform = math.matrix([
+    const A = math.matrix([
       [1, 0, 0, x],
       [0, 1, 0, y],
       [0, 0, 1, z],
       [0, 0, 0, 1],
     ]);
-    this._basisMatrix = math.multiply(transform, this._basisMatrix);
+    const Atrans = math.transpose(A);
+    this._basisMatrix = math.multiply(Atrans, this._basisMatrix);
     this._renderer.translate(x, y, z);
   } else {
-    const transform = math.matrix([
+    const A = math.matrix([
       [1, 0, x],
       [0, 1, y],
       [0, 0, 1],
     ]);
-    this._basisMatrix = math.multiply(transform, this._basisMatrix);
+    const Atrans = math.transpose(A);
+    this._basisMatrix = math.multiply(Atrans, this._basisMatrix);
     this._renderer.translate(x, y);
   }
 
@@ -92,12 +94,13 @@ p5.prototype.translate = function (x, y, z) {
 
 p5.prototype.rotate = function (angle, axis) {
   p5._validateParameters("rotate", arguments);
-  const transform = math.matrix([
-    [this.cos(angle), this.sin(angle), 0],
-    [-this.sin(angle), this.cos(angle), 0],
+  const A = math.matrix([
+    [this.cos(-angle), this.sin(-angle), 0],
+    [-this.sin(-angle), this.cos(-angle), 0],
     [0, 0, 1],
   ]);
-  this._basisMatrix = math.multiply(transform, this._basisMatrix);
+  const Atrans = math.transpose(A);
+  this._basisMatrix = math.multiply(Atrans, this._basisMatrix);
   this._renderer.rotate(this._toRadians(angle), axis);
   return this;
 };
@@ -123,20 +126,22 @@ p5.prototype.scale = function (x, y, z) {
   }
 
   if (this._renderer.isP3D) {
-    const transform = math.matrix([
+    const A = math.matrix([
       [x, 0, 0, 0],
       [0, y, 0, 0],
       [0, 0, z, 0],
       [0, 0, 0, 1],
     ]);
-    this._basisMatrix = math.multiply(transform, this._basisMatrix);
+    const Atrans = math.transpose(A);
+    this._basisMatrix = math.multiply(Atrans, this._basisMatrix);
   } else {
-    const transform = math.matrix([
+    const A = math.matrix([
       [x, 0, 0],
       [0, y, 0],
       [0, 0, 1],
     ]);
-    this._basisMatrix = math.multiply(transform, this._basisMatrix);
+    const Atrans = math.transpose(A);
+    this._basisMatrix = math.multiply(Atrans, this._basisMatrix);
   }
 
   this._renderer.scale.call(this._renderer, x, y, z);
@@ -469,11 +474,12 @@ p5.prototype.drawXAxis = function (length, size) {
 p5.prototype._anyMoving = false;
 
 class MovableCircle {
-  constructor(pInst, x, y, d) {
+  constructor(pInst, x, y, d, clr = "red") {
     this.pInst = pInst;
     this.x = x;
     this.y = y;
     this.d = d;
+    this.clr = clr;
     this.isMovable = false;
     this.pInst._renderer.elt.addEventListener("mouseup", () => {
       this.pInst._anyMoving = false;
@@ -481,14 +487,32 @@ class MovableCircle {
     });
   }
 
+  _mouse() {
+    const mouse = {};
+    if (this.pInst._coordinateMode === this.pInst.RIGHT_HAND) {
+      mouse.x = this.pInst.mouseX;
+      mouse.y = this.pInst.height - this.pInst.mouseY;
+    } else {
+      mouse.x = this.pInst.mouseX;
+      mouse.y = this.pInst.mouseY;
+    }
+
+    const tmouse = {};
+    const inverse = math.inv(this.pInst._basisMatrix);
+    tmouse.x = mouse.x * inverse.get([0, 0]) + mouse.y * inverse.get([1, 0]) + 1 * inverse.get([2, 0]);
+    tmouse.y = mouse.x * inverse.get([0, 1]) + mouse.y * inverse.get([1, 1]) + 1 * inverse.get([2, 1]);
+
+    return tmouse;
+  }
+
   draw() {
     this.pInst.push();
     if (this.isMouseHovering() || this.isMovable) {
-      this.pInst.fill("red");
+      this.pInst.fill(this.clr);
     }
     if (this.isMovable) {
-      this.x = this.pInst.mouseX;
-      this.y = this.pInst.mouseY;
+      this.x = this._mouse().x;
+      this.y = this._mouse().y;
     }
     this.pInst.circle(this.x, this.y, this.d);
     this.makeMovable();
@@ -497,7 +521,7 @@ class MovableCircle {
 
   isMouseHovering() {
     return (
-      this.pInst.dist(this.pInst.mouseX, this.pInst.mouseY, this.x, this.y) <
+      this.pInst.dist(this._mouse().x, this._mouse().y, this.x, this.y) <
       this.d / 2
     );
   }
@@ -512,8 +536,8 @@ class MovableCircle {
   }
 }
 
-p5.prototype.createMovableCircle = function (x, y, d) {
-  return new MovableCircle(this, x, y, d);
+p5.prototype.createMovableCircle = function (x, y, d, clr = "red") {
+  return new MovableCircle(this, x, y, d, clr);
 };
 
 p5.prototype.unixTime = function () {
@@ -679,9 +703,15 @@ p5.Element.prototype.position = function () {
   }
 };
 
-
 // Python renaming
 
-p5.prototype.linmap = function (value, start1, stop1, start2, stop2, withinBounds) {
+p5.prototype.linmap = function (
+  value,
+  start1,
+  stop1,
+  start2,
+  stop2,
+  withinBounds
+) {
   return this.map(value, start1, stop1, start2, stop2, withinBounds);
 };
