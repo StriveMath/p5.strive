@@ -337,3 +337,37 @@ p5.prototype.linmap = function (
 ) {
   return this.map(value, start1, stop1, start2, stop2, withinBounds);
 };
+
+// ====================================
+// Load Functions
+//
+// TODO: clean up, move to p5.js fork
+// ====================================
+p5.prototype.assets = {};
+
+p5.prototype._assetsRemaining = 0;
+
+p5.prototype.assetsLoaded = function () {
+  return this._preloadCount + this._assetsRemaining === 0;
+};
+
+p5.prototype._loadSound = p5.prototype.loadSound;
+
+p5.prototype.loadSound = function (path, name) {
+  this._assetsRemaining += 1;
+  this.assets[name] = this._loadSound(path);
+};
+
+p5.prototype._loadImage = p5.prototype.loadImage;
+
+p5.prototype.loadImage = function (path, name) {
+  this._assetsRemaining += 1;
+  this.assets[name] = this._loadImage(path);
+};
+
+p5.prototype._loadFont = p5.prototype.loadFont;
+
+p5.prototype.loadFont = function (path, name) {
+  this._assetsRemaining += 1;
+  this.assets[name] = this._loadFont(path);
+};
