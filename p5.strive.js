@@ -369,5 +369,9 @@ p5.prototype._loadFont = p5.prototype.loadFont;
 
 p5.prototype.loadFont = function (path, name) {
   this._assetsRemaining += 1;
+  let _path = path;
+  if (path === 'Press Start 2P') {
+    _path = 'https://cdn.jsdelivr.net/gh/StriveMath/fonts/Press_Start_2P/PressStart2P-Regular.ttf';
+  }
   this.assets[name] = this._loadFont(path);
 };
