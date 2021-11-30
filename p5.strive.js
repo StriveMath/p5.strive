@@ -326,6 +326,67 @@ p5.prototype.unixTime = function () {
   return Math.round(Date.now() / 1000);
 };
 
+// Heavily inspired by p5.SceneManager
+p5.prototype.createManager = function () {
+  const pInst = this;
+
+  class Manager {
+    constructor() {
+      this.m;
+      this.milestones = {};
+      this.events = [
+        "mouseClicked",
+        "mousePressed",
+        "mouseReleased",
+        "mouseMoved",
+        "mouseDragged",
+        "doubleClicked",
+        "mouseWheel",
+        "keyPressed",
+        "keyReleased",
+        "keyTyped",
+        "touchStarted",
+        "touchMoved",
+        "touchEnded",
+        "deviceMoved",
+        "deviceTurned",
+        "deviceShaken",
+      ];
+    }
+
+    add(m, fn) {
+      this.milestones[m] = fn;
+    }
+
+    play(m) {
+      this.stop();
+      this.m = new p5(this.milestones[m], "sketch-holder");
+    }
+
+    keyPressed() {
+      if (this.m && "keyPressed" in this.m) {
+        this.m.key = pInst.key;
+        this.m.keyPressed();
+      }
+    }
+
+    keyReleased() {
+      if (this.m && "keyReleased" in this.m) {
+        this.m.key = pInst.key;
+        this.m.keyReleased();
+      }
+    }
+
+    stop() {
+      if (this.m) {
+        this.m.remove();
+      }
+    }
+  }
+
+  return new Manager();
+};
+
 // ====================================
 // Python Compatibility
 // ====================================
