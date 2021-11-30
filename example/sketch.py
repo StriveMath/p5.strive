@@ -1,27 +1,33 @@
 from p5 import *
 
 def setup():
-  createCanvas(600, 400)
-  background(220)
-  drawTickAxes()
-  circle(100, 300, 50)
-  # global s, p
-  # s = createSlider(0, 255, 100)
-  # s.position(205, 300)
-  # s.style('width', '100px')
-  # p = createMovableCircle(500, 100, 25)
+  createCanvas(400, 400)
+  
 
-# def draw():
-#   background(s.value())
-#   p.draw()
-#   drawTickAxes()
-#   push()
-#   translate(200, 200)
-#   scale(sin(frameCount))
-#   rotate(-frameCount)
-#   stroke('white')
-#   line(0, 0, 100, 50)
-#   pop()
-#   translate(100, 200)
-#   rotate(frameCount)
-#   rect(0, 0, 80, 20)
+def draw():
+  background('black')
+  textSize(24)
+  spacing = 100
+  axisColor = 'hotpink'
+  gridColor = 'ghostwhite'
+  labelColor = 'dodgerblue'
+  labelSize = 16
+  axisThickness = 10
+  tickThickness = 5
+  gridThickness = 1
+  drawTickAxes(
+    spacing,
+    axisColor,
+    gridColor,
+    labelColor,
+    labelSize,
+    axisThickness,
+    tickThickness,
+    gridThickness
+  )
+  fill('white')
+  noStroke()
+  circle(mouseX, mouseY, 10)
+  text(f'\t({mouseX}, {mouseY})', mouseX, mouseY)
+  circle(100, 200, 10)
+  text('\t(100, 200)', 100, 200)
