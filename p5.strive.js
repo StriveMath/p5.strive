@@ -377,6 +377,18 @@ p5.prototype.createManager = function () {
       }
     }
 
+    mousePressed() {
+      if (this.m && "mousePressed" in this.m) {
+        this.m.mousePressed();
+      }
+    }
+
+    mouseReleased() {
+      if (this.m && "mouseReleased" in this.m) {
+        this.m.mouseReleased();
+      }
+    }
+
     stop() {
       if (this.m) {
         this.m.remove();
@@ -385,6 +397,85 @@ p5.prototype.createManager = function () {
   }
 
   return new Manager();
+};
+
+p5.prototype.die = function (x, y, roll = 1, diceColor = "red") {
+  let s = 15;
+  this.push();
+  this.fill(diceColor);
+  this.noStroke();
+  this.rectMode(this.CENTER);
+  this.square(x, y, 4 * s, 6);
+  this.fill("white");
+  if (roll === 1) {
+    this.circle(x, y, s);
+  } else if (roll === 2) {
+    this.circle(x + s, y - s, s);
+    this.circle(x - s, y + s, s);
+  } else if (roll === 3) {
+    this.circle(x, y, s);
+    this.circle(x + s, y - s, s);
+    this.circle(x - s, y + s, s);
+  } else if (roll === 4) {
+    this.circle(x + s, y - s, s);
+    this.circle(x - s, y + s, s);
+    this.circle(x + s, y + s, s);
+    this.circle(x - s, y - s, s);
+  } else if (roll === 5) {
+    this.circle(x, y, s);
+    this.circle(x + s, y - s, s);
+    this.circle(x - s, y + s, s);
+    this.circle(x + s, y + s, s);
+    this.circle(x - s, y - s, s);
+  } else {
+    this.circle(x + s, y - (s * 6) / 5, s);
+    this.circle(x - s, y + (s * 6) / 5, s);
+    this.circle(x + s, y + (s * 6) / 5, s);
+    this.circle(x - s, y - (s * 6) / 5, s);
+    this.circle(x - s, y, s);
+    this.circle(x + s, y, s);
+  }
+  this.pop();
+};
+
+p5.prototype.drawBarGraph = function (
+  array,
+  barColor = "red",
+  axisColor = "white",
+  ox = 50,
+  oy = 50
+) {
+  let xWidth = this.width - ox - 15;
+  let yHeight = this.height - oy - 15;
+  let barWidth = xWidth / (2 * array.length);
+  let barHeight = 2;
+  this.push();
+  this.textAlign(this.CENTER, this.CENTER);
+  this.textSize(18);
+  this.translate(ox, oy);
+  // Axes
+  this.fill(axisColor);
+  this.stroke(axisColor);
+  this.line(0, 0, xWidth, 0);
+  this.triangle(xWidth, 10, xWidth, -10, xWidth + 15, 0);
+  this.line(0, 0, 0, yHeight);
+  this.triangle(-10, yHeight, 10, yHeight, 0, yHeight + 15);
+  // Labels
+  this.noStroke();
+  // FIXME: this is a hack
+  if (this.frameCount > 1) {
+    for (let i = 0; i < array.length; i += 1) {
+      let x = barWidth + 2 * i * barWidth;
+      this.text(i + 1, x, -this.textSize());
+    }
+  }
+  // Bars
+  this.fill(barColor);
+  this.stroke(axisColor);
+  for (let i = 0; i < array.length; i += 1) {
+    let x = 2 * i * barWidth;
+    this.rect(x, 0, 2 * barWidth, array[i] * barHeight);
+  }
 };
 
 // ====================================
