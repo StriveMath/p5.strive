@@ -416,7 +416,7 @@ p5.prototype.createManager = function () {
   return new Manager();
 };
 
-p5.prototype.die = function (x, y, roll = 1, diceColor = "red") {
+p5.prototype.die = function (roll, x, y, diceColor = "red") {
   let s = 15;
   this.push();
   this.fill(diceColor);
@@ -457,15 +457,15 @@ p5.prototype.die = function (x, y, roll = 1, diceColor = "red") {
 
 p5.prototype.drawBarGraph = function (
   array,
-  barColor = "red",
-  axisColor = "white",
   ox = 50,
-  oy = 50
+  oy = 50,
+  barHeight = 2,
+  barColor = "red",
+  axisColor = "white"
 ) {
   let xWidth = this.width - ox - 15;
   let yHeight = this.height - oy - 15;
   let barWidth = xWidth / (2 * array.length);
-  let barHeight = 2;
   this.push();
   this.textAlign(this.CENTER, this.CENTER);
   this.translate(ox, oy);
