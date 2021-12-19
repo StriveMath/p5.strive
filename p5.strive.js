@@ -98,6 +98,7 @@ p5.prototype.responsiveText = function (val, x, y) {
 };
 
 p5.prototype.drawTickAxes = function (
+  scaleFactor = 1,
   spacing = 50,
   axisColor = "rgb(20,45,217)",
   gridColor = "rgba(255,255,255,0.6)",
@@ -108,14 +109,14 @@ p5.prototype.drawTickAxes = function (
   gridThickness = 0.25
 ) {
   this.push();
-  this.textSize(labelSize);
+  this.textSize(labelSize / scaleFactor);
   this.textAlign(this.CENTER, this.CENTER);
-  for (let y = 0; y < this.height; y += spacing) {
+  for (let y = 0; y < this.height / scaleFactor; y += spacing / scaleFactor) {
     // tickmarks
     this.stroke(axisColor);
-    this.strokeWeight(tickThickness);
-    this.line(5, y, -5, y);
-    this.line(5, -y, -5, -y);
+    this.strokeWeight(tickThickness / scaleFactor);
+    this.line(5 / scaleFactor, y, -5 / scaleFactor, y);
+    this.line(5 / scaleFactor, -y, -5 / scaleFactor, -y);
 
     // labels
     if (y !== 0) {
@@ -126,18 +127,18 @@ p5.prototype.drawTickAxes = function (
     }
 
     // gridlines
-    this.strokeWeight(gridThickness);
+    this.strokeWeight(gridThickness / scaleFactor);
     this.stroke(this.color(gridColor));
-    this.line(-this.width, y, this.width, y);
-    this.line(-this.width, -y, this.width, -y);
+    this.line(-this.width / scaleFactor, y, this.width / scaleFactor, y);
+    this.line(-this.width / scaleFactor, -y, this.width / scaleFactor, -y);
   }
 
-  for (let x = 0; x < this.width; x += spacing) {
+  for (let x = 0; x < this.width / scaleFactor; x += spacing / scaleFactor) {
     // tickmarks
     this.stroke(axisColor);
-    this.strokeWeight(tickThickness);
-    this.line(x, +5, x, -5);
-    this.line(-x, +5, -x, -5);
+    this.strokeWeight(tickThickness / scaleFactor);
+    this.line(x, 5 / scaleFactor, x, -5 / scaleFactor);
+    this.line(-x, 5 / scaleFactor, -x, -5 / scaleFactor);
 
     // labels
     if (x !== 0) {
@@ -148,17 +149,17 @@ p5.prototype.drawTickAxes = function (
     }
 
     // gridlines
-    this.strokeWeight(gridThickness);
+    this.strokeWeight(gridThickness / scaleFactor);
     this.stroke(this.color(gridColor));
     this.line(x, -this.height, x, this.height);
     this.line(-x, -this.height, -x, this.height);
   }
   this.stroke(axisColor);
-  this.strokeWeight(axisThickness);
+  this.strokeWeight(axisThickness / scaleFactor);
   // x-axis
-  this.line(-this.width, 0, this.width, 0);
+  this.line(-this.width / scaleFactor, 0, this.width / scaleFactor, 0);
   // y-axis
-  this.line(0, this.height, 0, -this.height);
+  this.line(0, this.height / scaleFactor, 0, -this.height / scaleFactor);
   // origin
   this.fill(labelColor);
   this.noStroke();
@@ -261,6 +262,7 @@ class MovableCircle {
       this.pInst._anyMoving = false;
       this.isMovable = false;
     });
+    this.locked = { x: "free", y: "free" };
   }
 
   _mouse() {
@@ -293,8 +295,13 @@ class MovableCircle {
       this.pInst.fill(this.clr);
     }
     if (this.isMovable) {
-      this.x = this._mouse().x;
-      this.y = this._mouse().y;
+      if (this.locked.x === "free") {
+        this.x = this._mouse().x;
+      }
+
+      if (this.locked.y === "free") {
+        this.y = this._mouse().y;
+      }
     }
     this.pInst.circle(this.x, this.y, this.d);
     this.makeMovable();
@@ -314,6 +321,16 @@ class MovableCircle {
         this.pInst._anyMoving = true;
         this.isMovable = true;
       }
+    }
+  }
+
+  lock(coordinate, value) {
+    if (coordinate === "x") {
+      this.locked.x = value;
+      this.x = value;
+    } else if (coordinate === "y") {
+      this.locked.y = value;
+      this.y = value;
     }
   }
 }
@@ -451,7 +468,6 @@ p5.prototype.drawBarGraph = function (
   let barHeight = 2;
   this.push();
   this.textAlign(this.CENTER, this.CENTER);
-  this.textSize(18);
   this.translate(ox, oy);
   // Axes
   this.fill(axisColor);
