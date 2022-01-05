@@ -1,0 +1,3 @@
+The p5.strive library bundles math.js which is licensed under the Apache License 2.0.
+
+- https://github.com/josdejong/mathjs/blob/develop/LICENSE
