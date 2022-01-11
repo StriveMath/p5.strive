@@ -8,3 +8,5 @@ def setup():
 def draw():
   background('black')
   drawTickAxes()
+  fill('hotpink')
+  circle(200, 200, 50)

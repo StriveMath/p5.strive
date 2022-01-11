@@ -248,6 +248,30 @@ p5.prototype.drawXAxis = function (length, size) {
   this.pop();
 };
 
+p5.prototype.mouse = function () {
+  const m = {};
+  if (this._coordinateMode === this.RIGHT_HAND) {
+    m.x = this.mouseX;
+    m.y = this.height - this.mouseY;
+  } else {
+    m.x = this.mouseX;
+    m.y = this.mouseY;
+  }
+
+  const tm = {};
+  const inverse = math.inv(this._basisMatrix);
+  tm.x =
+    m.x * inverse.get([0, 0]) +
+    m.y * inverse.get([1, 0]) +
+    1 * inverse.get([2, 0]);
+  tm.y =
+    m.x * inverse.get([0, 1]) +
+    m.y * inverse.get([1, 1]) +
+    1 * inverse.get([2, 1]);
+
+  return tm;
+};
+
 p5.prototype._anyMoving = false;
 
 class MovableCircle {
@@ -265,30 +289,6 @@ class MovableCircle {
     this.locked = { x: "free", y: "free" };
   }
 
-  _mouse() {
-    const mouse = {};
-    if (this.pInst._coordinateMode === this.pInst.RIGHT_HAND) {
-      mouse.x = this.pInst.mouseX;
-      mouse.y = this.pInst.height - this.pInst.mouseY;
-    } else {
-      mouse.x = this.pInst.mouseX;
-      mouse.y = this.pInst.mouseY;
-    }
-
-    const tmouse = {};
-    const inverse = math.inv(this.pInst._basisMatrix);
-    tmouse.x =
-      mouse.x * inverse.get([0, 0]) +
-      mouse.y * inverse.get([1, 0]) +
-      1 * inverse.get([2, 0]);
-    tmouse.y =
-      mouse.x * inverse.get([0, 1]) +
-      mouse.y * inverse.get([1, 1]) +
-      1 * inverse.get([2, 1]);
-
-    return tmouse;
-  }
-
   draw() {
     this.pInst.push();
     if (this.isMouseHovering() || this.isMovable) {
@@ -296,11 +296,11 @@ class MovableCircle {
     }
     if (this.isMovable) {
       if (this.locked.x === "free") {
-        this.x = this._mouse().x;
+        this.x = this.pInst.mouse().x;
       }
 
       if (this.locked.y === "free") {
-        this.y = this._mouse().y;
+        this.y = this.pInst.mouse().y;
       }
     }
     this.pInst.circle(this.x, this.y, this.d);
@@ -309,10 +309,8 @@ class MovableCircle {
   }
 
   isMouseHovering() {
-    return (
-      this.pInst.dist(this._mouse().x, this._mouse().y, this.x, this.y) <
-      this.d / 2
-    );
+    const m = this.pInst.mouse();
+    return this.pInst.dist(m.x, m.y, this.x, this.y) < this.d / 2;
   }
 
   makeMovable() {
@@ -369,10 +367,10 @@ p5.prototype.createManager = function (
   });
 };
 
-p5.prototype.die = function (roll, x, y, diceColor = "red") {
+p5.prototype.die = function (roll, x, y, clr = "red") {
   let s = 15;
   this.push();
-  this.fill(diceColor);
+  this.fill(clr);
   this.noStroke();
   this.rectMode(this.CENTER);
   this.square(x, y, 4 * s, 6);
