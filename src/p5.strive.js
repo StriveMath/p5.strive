@@ -343,77 +343,30 @@ p5.prototype.unixTime = function () {
   return Math.round(Date.now() / 1000);
 };
 
-// Heavily inspired by p5.SceneManager
-p5.prototype.createManager = function () {
-  const pInst = this;
+p5.prototype.createManager = function (
+  numMilestones,
+  path = "milestones",
+  prefix = "m"
+) {
+  document.addEventListener("keypress", function (event) {
+    for (let i = 0; i < numMilestones; i += 1) {
+      if (event.keyCode === 49 + i) {
+        const pre = document.getElementById("output");
+        if (!pre === null) {
+          pre.remove();
+        }
 
-  class Manager {
-    constructor() {
-      this.m;
-      this.milestones = {};
-      this.events = [
-        "mouseClicked",
-        "mousePressed",
-        "mouseReleased",
-        "mouseMoved",
-        "mouseDragged",
-        "doubleClicked",
-        "mouseWheel",
-        "keyPressed",
-        "keyReleased",
-        "keyTyped",
-        "touchStarted",
-        "touchMoved",
-        "touchEnded",
-        "deviceMoved",
-        "deviceTurned",
-        "deviceShaken",
-      ];
-    }
+        const div = document.getElementById("sketch-holder");
+        if (!div === null) {
+          div.remove();
+        }
 
-    add(m, fn) {
-      this.milestones[m] = fn;
-    }
-
-    play(m) {
-      this.stop();
-      this.m = new p5(this.milestones[m], "sketch-holder");
-    }
-
-    keyPressed() {
-      if (this.m && "keyPressed" in this.m) {
-        this.m.key = pInst.key;
-        this.m.keyPressed();
+        const filename = `${path}/${prefix}${i + 1}.py`;
+        runCode(filename);
+        break;
       }
     }
-
-    keyReleased() {
-      if (this.m && "keyReleased" in this.m) {
-        this.m.key = pInst.key;
-        this.m.keyReleased();
-      }
-    }
-
-    mousePressed() {
-      if (this.m && "mousePressed" in this.m) {
-        this.m.mousePressed();
-      }
-    }
-
-    mouseReleased() {
-      if (this.m && "mouseReleased" in this.m) {
-        this.m.mouseReleased();
-      }
-    }
-
-    stop() {
-      if (this.m) {
-        this.m.remove();
-      }
-    }
-  }
-
-  return new Manager();
+  });
 };
 
 p5.prototype.die = function (roll, x, y, diceColor = "red") {
