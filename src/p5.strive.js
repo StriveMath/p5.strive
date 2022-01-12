@@ -85,6 +85,12 @@ p5.prototype.registerMethod("post", function () {
 // Strive Functions
 // ====================================
 
+function p5Error(message = "") {
+  this.name = "🌸 p5.js says";
+  this.message = message;
+}
+p5Error.prototype = Error.prototype;
+
 p5.prototype.responsiveText = function (val, x, y) {
   const yScale = this._basisMatrix.get([1, 1]);
   if (yScale >= 0) {
@@ -367,14 +373,23 @@ p5.prototype.createManager = function (
   });
 };
 
-p5.prototype.die = function (roll, x, y, clr = "red") {
+p5.prototype.die = function (
+  roll,
+  x,
+  y,
+  primary = "white",
+  secondary = "black"
+) {
+  if ([1, 2, 3, 4, 5, 6].indexOf(roll) < 0) {
+    throw new p5Error("roll must be an integer from 1 to 6");
+  }
   let s = 15;
   this.push();
-  this.fill(clr);
+  this.fill(primary);
   this.noStroke();
   this.rectMode(this.CENTER);
   this.square(x, y, 4 * s, 6);
-  this.fill("white");
+  this.fill(secondary);
   if (roll === 1) {
     this.circle(x, y, s);
   } else if (roll === 2) {
