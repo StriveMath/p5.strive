@@ -406,43 +406,62 @@ p5.prototype.die = function (roll, x, y, clr = "red") {
   this.pop();
 };
 
-p5.prototype.drawBarGraph = function (
-  array,
-  ox = 50,
-  oy = 50,
-  barHeight = 2,
-  barColor = "red",
-  axisColor = "white"
-) {
-  let xWidth = this.width - ox - 15;
-  let yHeight = this.height - oy - 15;
-  let barWidth = xWidth / (2 * array.length);
+p5.prototype.drawBarGraph = function (data, labels, width, height, barScale) {
+  const ox = this._basisMatrix.get([2, 0]);
+  const oy = this._basisMatrix.get([2, 1]);
+  let _width;
+  if (!width) {
+    _width = this.width - ox - 16;
+  } else {
+    _width = width;
+  }
+  let _height;
+  if (!height) {
+    _height = this.height - (this.height - oy) - 16;
+  } else {
+    _height = height;
+  }
+  let barWidth = (_width - 2) / (2 * data.length);
   this.push();
   this.textAlign(this.CENTER, this.CENTER);
-  this.translate(ox, oy);
   // Axes
-  this.fill(axisColor);
-  this.stroke(axisColor);
-  this.line(0, 0, xWidth, 0);
-  this.triangle(xWidth, 10, xWidth, -10, xWidth + 15, 0);
-  this.line(0, 0, 0, yHeight);
-  this.triangle(-10, yHeight, 10, yHeight, 0, yHeight + 15);
+  this.push();
+  this.noFill();
+  this.line(0, 0, _width, 0);
+  this.triangle(_width, 10, _width, -10, _width + 15, 0);
+  this.line(0, 0, 0, _height);
+  this.triangle(-10, _height, 10, _height, 0, _height + 15);
+  this.pop();
   // Labels
   this.noStroke();
   // FIXME: this is a hack
   if (this.frameCount > 1) {
-    for (let i = 0; i < array.length; i += 1) {
-      let x = barWidth + 2 * i * barWidth;
-      this.text(i + 1, x, -this.textSize());
+    if (labels) {
+      for (let i = 0; i < data.length; i += 1) {
+        let x = barWidth + 2 * i * barWidth;
+        this.text(labels[i], x, -this.textSize());
+      }
+    } else {
+      for (let i = 0; i < data.length; i += 1) {
+        let x = barWidth + 2 * i * barWidth;
+        this.text(i + 1, x, -this.textSize());
+      }
     }
   }
   // Bars
-  this.fill(barColor);
-  this.stroke(axisColor);
-  for (let i = 0; i < array.length; i += 1) {
-    let x = 2 * i * barWidth;
-    this.rect(x, 0, 2 * barWidth, array[i] * barHeight);
+  this.push();
+  this.noStroke();
+  let _barScale;
+  if (!barScale) {
+    _barScale = 5;
+  } else {
+    _barScale = barScale;
   }
+  for (let i = 0; i < data.length; i += 1) {
+    let x = 2 * i * barWidth + 1;
+    this.rect(x, 1, 2 * barWidth, data[i] * _barScale);
+  }
+  this.pop();
 };
 
 // ====================================
