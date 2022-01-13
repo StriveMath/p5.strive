@@ -195,36 +195,38 @@ p5.prototype.arrow = function (tailX, tailY, headX, headY) {
   this.pop();
 };
 
-p5.prototype.draw3DAxes = function (size, redVal, greenVal, blueVal) {
+p5.prototype.draw3DAxes = function (size, clr = "violet") {
+  const _clr = this.color(clr);
   this.push();
-  this.stroke(redVal, greenVal, blueVal);
-  this.drawOrigin(10);
 
+  const sz = size / 30;
   this.stroke(255);
-  this.strokeWeight(2);
-  this.fill(redVal, greenVal, blueVal);
-  this.drawXAxis(size, size / 30);
-  this.drawYAxis(size, size / 30);
-  this.drawZAxis(size, size / 30);
+  this.fill(_clr);
+  this.drawXAxis(size, sz);
+  this.drawYAxis(size, sz);
+  this.drawZAxis(size, sz);
 
-  this.fill(redVal, greenVal, blueVal, 35);
+  this.stroke(_clr);
+  this.drawOrigin(sz);
+
+  const planeSize = 2 * (size + sz);
+  _clr.setAlpha(35);
+  this.fill(_clr);
   this.noStroke();
-  this.plane(2 * size, 2 * size);
+  this.plane(planeSize, planeSize);
   this.rotateX(90);
-  this.plane(2 * size, 2 * size);
+  this.plane(planeSize, planeSize);
   this.rotateY(90);
-  this.plane(2 * size, 2 * size);
+  this.plane(planeSize, planeSize);
   this.pop();
 };
 
 p5.prototype.drawOrigin = function (size) {
-  this.strokeWeight(size);
-  this.point(0, 0, 0);
+  this.sphere(size);
 };
 
 p5.prototype.drawZAxis = function (length, size) {
   this.line(0, 0, 0, 0, 0, length);
-
   this.push();
   this.translate(0, 0, length);
   this.rotateX(90);
@@ -235,7 +237,6 @@ p5.prototype.drawZAxis = function (length, size) {
 
 p5.prototype.drawYAxis = function (length, size) {
   this.line(0, 0, 0, 0, length, 0);
-
   this.push();
   this.translate(0, length, 0);
   this.noStroke();
@@ -245,7 +246,6 @@ p5.prototype.drawYAxis = function (length, size) {
 
 p5.prototype.drawXAxis = function (length, size) {
   this.line(0, 0, 0, length, 0, 0);
-
   this.push();
   this.translate(length, 0, 0);
   this.rotateZ(-90);
