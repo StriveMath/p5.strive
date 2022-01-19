@@ -10,14 +10,30 @@
  *
  * In other words, the canvas is now Quadrant I from math class.
  */
+
+/**
+ * Constant to be used with the coordinateMode() function, to set the mode which
+ * p5.js interprets and calculates angles (either LEFT_HAND or RIGHT_HAND).
+ * @property {String} RIGHT_HAND
+ * @final
+ */
 p5.prototype.RIGHT_HAND = "right-hand";
+
+/**
+ * Constant to be used with the coordinateMode() function, to set the mode which
+ * p5.js interprets and calculates angles (either LEFT_HAND or RIGHT_HAND).
+ * @property {String} LEFT_HAND
+ * @final
+ */
 p5.prototype.LEFT_HAND = "left-hand";
+
+// Set the default coordinate mode to right-handed.
 p5.prototype._coordinateMode = p5.prototype.RIGHT_HAND;
 
 /**
- * Transforms the coordinate system based on the current coordinateMode.
+ * Transforms the coordinate system based on the current coordinateMode().
  */
-p5.prototype.rightHanded = function _rightHanded() {
+p5.prototype.rightHanded = function () {
   if (this._renderer.isP3D) {
     this.scale(1, -1);
   } else {
@@ -29,7 +45,7 @@ p5.prototype.rightHanded = function _rightHanded() {
 /**
  * Transforms the coordinate system based on the current coordinateMode.
  */
-p5.prototype._toRightHand = function _toRightHand() {
+p5.prototype._toRightHand = function () {
   if (this._coordinateMode === this.RIGHT_HAND) {
     this.rightHanded();
   }
@@ -39,7 +55,7 @@ p5.prototype._toRightHand = function _toRightHand() {
  * Sets the camera position to its current position. No idea why
  * this is necessary, but it works!
  */
-p5.prototype._camTinker = function _camTinker() {
+p5.prototype._camTinker = function () {
   if (this._renderer.isP3D) {
     const cam = this._renderer._curCamera;
     cam.setPosition(cam.eyeX, cam.eyeY, cam.eyeZ);
@@ -47,32 +63,35 @@ p5.prototype._camTinker = function _camTinker() {
 };
 
 /**
- * Transforms the coordinate system before and after draw() is called.
+ * Transforms the coordinate system before draw() is called.
  */
 p5.prototype.registerMethod("pre", p5.prototype._toRightHand);
 p5.prototype.registerMethod("pre", p5.prototype._camTinker);
-//  p5.prototype.registerMethod('post', p5.prototype._undoRightHand);
 
 /**
  * Sets the coordinate system mode to either left-handed or right-handed.
  *
  * @param {Constant} mode either LEFT_HAND or RIGHT_HAND
  */
-p5.prototype.coordinateMode = function _coordinateMode(mode) {
+p5.prototype.coordinateMode = function (mode) {
   if (mode === this.LEFT_HAND || mode === this.RIGHT_HAND) {
     p5.prototype._coordinateMode = mode;
   }
 };
 
-/**
- * Set the default angleMode to degrees.
- */
+// Set the default angleMode to degrees.
 p5.prototype._angleMode = p5.prototype.DEGREES;
 
+/**
+ * Creates an empty Array to store basis matrices.
+ */
 p5.prototype.registerMethod("init", function () {
   this._bases = [];
 });
 
+/**
+ * Initializes the basis matrix to the identity matrix.
+ */
 p5.prototype.registerMethod("post", function () {
   if (this._renderer.isP3D) {
     this._basisMatrix = math.identity(4);
@@ -82,15 +101,16 @@ p5.prototype.registerMethod("post", function () {
 });
 
 // ====================================
-// Strive Functions
+// Strive Extensions
 // ====================================
 
-function p5Error(message = "") {
-  this.name = "🌸 p5.js says";
-  this.message = message;
-}
-p5Error.prototype = Error.prototype;
-
+/**
+ * Draws text that always "correctly", regardless of the coordinate system.
+ *
+ * @param {*} val the alphanumeric symbols to be displayed
+ * @param {*} x   the x-coordinate of the text
+ * @param {*} y   the y-coordinate of the text
+ */
 p5.prototype.responsiveText = function (val, x, y) {
   const yScale = this._basisMatrix.get([1, 1]);
   if (yScale >= 0) {
@@ -103,6 +123,20 @@ p5.prototype.responsiveText = function (val, x, y) {
   }
 };
 
+/**
+ * Draws x and y-axes with tick marks, labels, and gridlines.
+ *
+ * @param {Number} scaleFactor    the scale factor applied to the coordinate system
+ *                                prior to drawing the axes
+ * @param {Number} spacing        the spacing between tick marks / gridlines
+ * @param {p5.Color} axisColor    the color to draw the axes
+ * @param {p5.Color} gridColor    the color to draw the gridlines
+ * @param {p5.Color} labelColor   the color to draw the labels
+ * @param {Number} labelSize      the size of the labels
+ * @param {Number} axisThickness  the thickness to draw the axes
+ * @param {Number} tickThickness  the thickness to draw the tick marks
+ * @param {Number} gridThickness  the thickness to draw the gridlines
+ */
 p5.prototype.drawTickAxes = function (
   scaleFactor = 1,
   spacing = 50,
@@ -173,6 +207,15 @@ p5.prototype.drawTickAxes = function (
   this.pop();
 };
 
+/**
+ * Draws a simple arrow given its tail (x,y) and head (x,y).
+ * Adapted from the p5.js documentation for p5.Vector.
+ *
+ * @param {Number} tailX the x-coordinate of the arrow's tail
+ * @param {Number} tailY the y-coordinate of the arrow's tail
+ * @param {Number} headX the x-coordinate of the arrow's head
+ * @param {Number} headY the y-coordinate of the arrow's head
+ */
 p5.prototype.arrow = function (tailX, tailY, headX, headY) {
   let x = headX - tailX;
   let y = headY - tailY;
@@ -195,6 +238,12 @@ p5.prototype.arrow = function (tailX, tailY, headX, headY) {
   this.pop();
 };
 
+/**
+ * Draws a set of x, y, and z-axes along with translucent planes.
+ *
+ * @param {Number} size  the extent of the axes
+ * @param {p5.Color} clr the color to render the planes oriented along each axis
+ */
 p5.prototype.draw3DAxes = function (size, clr = "violet") {
   const _clr = this.color(clr);
   this.push();
@@ -221,39 +270,68 @@ p5.prototype.draw3DAxes = function (size, clr = "violet") {
   this.pop();
 };
 
+/**
+ * Draws a sphere at the origin in 3D.
+ *
+ * @param {Number} size the size of the origin (sphere) in 3D
+ */
 p5.prototype.drawOrigin = function (size) {
   this.sphere(size);
 };
 
-p5.prototype.drawZAxis = function (length, size) {
+/**
+ *  Draws the z-axis in 3D.
+ *
+ * @param {Number} length     the length of the axis
+ * @param {Number} arrowSize  the size of the arrow (cone)
+ */
+p5.prototype.drawZAxis = function (length, arrowSize) {
   this.line(0, 0, 0, 0, 0, length);
   this.push();
   this.translate(0, 0, length);
   this.rotateX(90);
   this.noStroke();
-  this.cone(size, 2 * size);
+  this.cone(arrowSize, 2 * arrowSize);
   this.pop();
 };
 
-p5.prototype.drawYAxis = function (length, size) {
+/**
+ * Draws the y-axis in 3D.
+ *
+ * @param {Number} length     the length of the axis
+ * @param {Number} arrowSize  the size of the arrow (cone)
+ */
+p5.prototype.drawYAxis = function (length, arrowSize) {
   this.line(0, 0, 0, 0, length, 0);
   this.push();
   this.translate(0, length, 0);
   this.noStroke();
-  this.cone(size, 2 * size);
+  this.cone(arrowSize, 2 * arrowSize);
   this.pop();
 };
 
-p5.prototype.drawXAxis = function (length, size) {
+/**
+ *  Draws the x-axis in 3D.
+ *
+ * @param {Number} length     the length of the axis
+ * @param {Number} arrowSize  the size of the arrow (cone)
+ */
+p5.prototype.drawXAxis = function (length, arrowSize) {
   this.line(0, 0, 0, length, 0, 0);
   this.push();
   this.translate(length, 0, 0);
   this.rotateZ(-90);
   this.noStroke();
-  this.cone(size, 2 * size);
+  this.cone(arrowSize, 2 * arrowSize);
   this.pop();
 };
 
+/**
+ * Keeps track of the mouse's current position taking transformations
+ * into account.
+ *
+ * @returns {Object} containing the mouse's x and y-coordinates
+ */
 p5.prototype.mouse = function () {
   const m = {};
   if (this._coordinateMode === this.RIGHT_HAND) {
@@ -278,8 +356,13 @@ p5.prototype.mouse = function () {
   return tm;
 };
 
+// Boolean flag that indicates whether any MovableCircles are moving.
 p5.prototype._anyMoving = false;
 
+/**
+ * A class to define a circle that users can drag about the canvas with
+ * their mouse.
+ */
 class MovableCircle {
   constructor(pInst, x, y, d, clr = "red") {
     this.pInst = pInst;
@@ -339,14 +422,36 @@ class MovableCircle {
   }
 }
 
+/**
+ *  Creates a circle that users can drag about the canvas with their mouse.
+ *
+ * @param {Number} x      the circle's x-coordinate
+ * @param {Number} y      the circle's y-coordinate
+ * @param {Number} d      the circle's diameter
+ * @param {p5.Color} clr  the circle's color when hovered over (Optional)
+ * @returns
+ */
 p5.prototype.createMovableCircle = function (x, y, d, clr = "red") {
   return new MovableCircle(this, x, y, d, clr);
 };
 
+/**
+ *  Returns the current UNIX time in seconds.
+ *
+ * @returns {Number} the time
+ */
 p5.prototype.unixTime = function () {
   return Math.round(Date.now() / 1000);
 };
 
+/**
+ *  Simplifies the task of running separate sketches by switching in response
+ *  to key presses.
+ *
+ * @param {Number} numMilestones  the number of milestones
+ * @param {String} path           the path to the folder containing sketches (Optional)
+ * @param {String} prefix         the prefix used for files containing sketches (Optional)
+ */
 p5.prototype.createManager = function (
   numMilestones,
   path = "milestones",
@@ -373,6 +478,15 @@ p5.prototype.createManager = function (
   });
 };
 
+/**
+ * Draws a single die that displays a number 1-6.
+ *
+ * @param {Number} roll         the number to display
+ * @param {Number} x            the die's x-coordinate
+ * @param {Number} y            the die's y-coordinate
+ * @param {p5.Color} primary    the die's primary (background) color (Optional)
+ * @param {p5.Color} secondary  the die's secondary (circle) color (Optional)
+ */
 p5.prototype.die = function (
   roll,
   x,
@@ -421,6 +535,15 @@ p5.prototype.die = function (
   this.pop();
 };
 
+/**
+ * Draws a simple bar graph given an Array of data.
+ *
+ * @param {Number[]} data   the data to graph
+ * @param {Array} labels    the labels for the data (Optional)
+ * @param {Number} width    the width of the graph (Optional)
+ * @param {Number} height   the height of the graph (Optional)
+ * @param {Number} barScale the scale factor from data values to bar height (Optional)
+ */
 p5.prototype.drawBarGraph = function (data, labels, width, height, barScale) {
   const ox = this._basisMatrix.get([2, 0]);
   const oy = this._basisMatrix.get([2, 1]);
@@ -483,6 +606,18 @@ p5.prototype.drawBarGraph = function (data, labels, width, height, barScale) {
 // Python Compatibility
 // ====================================
 
+/**
+ * Wraps p5's map() function since the name is already in use in Python.
+ * Maps a number from one interval to another interval.
+ *
+ * @param {Number} value          the incoming value to be converted
+ * @param {Number} start1         lower bound of the value's current range
+ * @param {Number} stop1          upper bound of the value's current range
+ * @param {Number} start2         upper bound of the value's current range
+ * @param {Number} stop2          upper bound of the value's target range
+ * @param {Boolean} withinBounds  constrain the value to the newly mapped range (Optional)
+ * @returns
+ */
 p5.prototype.linmap = function (
   value,
   start1,
@@ -494,35 +629,78 @@ p5.prototype.linmap = function (
   return this.map(value, start1, stop1, start2, stop2, withinBounds);
 };
 
+/**
+ *  A custom Error type that enables the FES to work from Python.
+ *
+ * @param {String} message the error message to display
+ */
+function p5Error(message = "") {
+  this.name = "🌸 p5.js says";
+  this.message = message;
+}
+p5Error.prototype = Error.prototype;
+
 // ====================================
 // Load Functions
 //
 // TODO: clean up, move to p5.js fork
 // ====================================
+
+// A global Object to contain assets loaded by the loadX() functions.
 p5.prototype.assets = {};
 
+// An internal counter for the number of assets yet to load.
 p5.prototype._assetsRemaining = 0;
 
+/**
+ * Checks whether all assets have loaded.
+ *
+ * @returns {Boolean} whether all assets have loaded
+ */
 p5.prototype.assetsLoaded = function () {
   return this._preloadCount + this._assetsRemaining === 0;
 };
 
+// Alias for the loadSound() function
 p5.prototype._loadSound = p5.prototype.loadSound;
 
+/**
+ * loadSound() returns a new p5.SoundFile from a specified path and
+ * stores it in the global assets Object.
+ *
+ * @param {String} path the path to the sound file
+ * @param {String} name the name of the sound file's key in the assets Object
+ */
 p5.prototype.loadSound = function (path, name) {
   this._assetsRemaining += 1;
   this.assets[name] = this._loadSound(path);
 };
 
+// Alias for the loadImage() function
 p5.prototype._loadImage = p5.prototype.loadImage;
 
+/**
+ * Loads an image from a path, creates a p5.Image from it,
+ * and stores it in the global assets Object.
+ *
+ * @param {String} path the path to the image file
+ * @param {String} name the name of the image file's key in the assets Object
+ */
 p5.prototype.loadImage = function (path, name) {
   this._assetsRemaining += 1;
   this.assets[name] = this._loadImage(path);
 };
 
+// Alias for the loadFont() function
 p5.prototype._loadFont = p5.prototype.loadFont;
 
+/**
+ * Loads an opentype font file (.otf, .ttf) from a file or a URL
+ * and stores it in the global assets Object.
+ *
+ * @param {String} path the path to the font file
+ * @param {String} name the name of the font file's key in the assets Object
+ */
 p5.prototype.loadFont = function (path, name) {
   this._assetsRemaining += 1;
   let _path = path;
