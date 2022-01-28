@@ -327,6 +327,24 @@ p5.prototype.drawXAxis = function (length, arrowSize) {
 };
 
 /**
+ * @param {p5.Vector} O  the tail of the vector
+ * @param {p5.Vector} V  the head of the vector
+*/
+
+p5.prototype.drawVector = function (O, V) {
+  // assume parameters are vectors
+  line(O.x, O.y, O.x+V.x, O.y+V.y)
+  push()
+  noStroke()
+  translate(O.x, O.y)
+  rotate(V.heading())
+  translate(V.mag(), 0)
+  scale(sqrt(V.mag())/10)
+  triangle(0, 10, 0, -10, 10, 0)
+  pop()
+}
+
+/**
  * Keeps track of the mouse's current position taking transformations
  * into account.
  *
