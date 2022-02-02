@@ -327,6 +327,27 @@ p5.prototype.drawXAxis = function (length, arrowSize) {
 };
 
 /**
+ * @param {number} O_x  the x coordinate of the tail of the vector
+ * @param {number} O_y  the y coordinate of the tail of the vector
+ * @param {p5.Vector} V  the head of the vector
+ * @param {boolean or list} dash False by default. Otherwise, it makes a dashed line with the sequence specified by a list
+*/
+p5.prototype.drawVector = function (O_x, O_y, V, dash=false){
+  // assume parameters are vectors
+  push()
+  if (dash != false) {
+    drawingContext.setLineDash(dash);
+  }
+  line(O_x, O_y, O_x+V.x, O_y+V.y);
+  noStroke();
+  translate(O_x, O_y);
+  rotate(V.heading());
+  translate(V.mag()-10, 0);
+  triangle(0, 5, 0, -5, 10, 0);
+  pop();
+ }
+
+/**
  * Keeps track of the mouse's current position taking transformations
  * into account.
  *
