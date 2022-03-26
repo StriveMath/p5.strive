@@ -27,7 +27,6 @@ def copy_map(filename):
 if __name__ == '__main__':
   files = [
     'lib/p5.js',
-    'lib/p5.sound.min.js',
     'lib/math.js',
     'src/p5.strive.js',
     'lib/skulpt.min.js',
@@ -36,7 +35,7 @@ if __name__ == '__main__':
     'lib/skulptSetup.js'
   ]
   package = concat(files)
-  filename = os.path.join(os.getcwd(), 'dist', 'strive.js')
+  filename = os.path.join(os.getcwd(), 'dist', 'strive-new.js')
   write(package, filename)
   copy_map('p5.sound.min.js.map')
   copy_map('skulpt.min.js.map')
