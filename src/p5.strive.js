@@ -89,20 +89,44 @@ p5.prototype.registerMethod("init", function () {
   this._bases = [];
 });
 
-/**
- * Initializes the basis matrix to the identity matrix.
- */
-p5.prototype.registerMethod("post", function () {
-  if (this._renderer.isP3D) {
-    this._basisMatrix = math.identity(4);
-  } else {
-    this._basisMatrix = math.identity(3);
-  }
-});
-
 // ====================================
 // Strive Extensions
 // ====================================
+
+p5.prototype.striveText = function (str, x, y) {
+  if (this._coordinateMode === this.LEFT_HAND) {
+    this.text(str, x, y);
+  } else {
+    this.push();
+    this.scale(1, -1);
+    this.text(str, x, -y);
+    this.pop();
+  }
+};
+
+p5.prototype.striveImage = function (img, x, y, width, height, sx, sy, sWidth, sHeight) {
+  if (this._coordinateMode === this.LEFT_HAND) {
+    this.image(...arguments);
+  } else {
+    let defH = img.height;
+
+    if (img.elt && img.elt.videoWidth && !img.canvas) {
+      // video no canvas
+      defH = img.elt.videoHeight;
+    }
+
+    const _height = height ?? defH;
+    const _sHeight = sHeight ?? defH;
+
+    arguments[3] *= -1;
+
+    this.push();
+    this.translate(0, _height);
+    this.scale(1, -1);
+    this.image(...arguments);
+    this.pop();
+  };
+}
 
 /**
  * Draws text that always "correctly", regardless of the coordinate system.
@@ -112,7 +136,8 @@ p5.prototype.registerMethod("post", function () {
  * @param {*} y   the y-coordinate of the text
  */
 p5.prototype.responsiveText = function (val, x, y) {
-  const yScale = this._basisMatrix.get([1, 1]);
+  const transform_matrix = this.drawingContext.getTransform();
+  const yScale = transform_matrix.d
   if (yScale >= 0) {
     this.text(val, x, y);
   } else {
@@ -332,20 +357,20 @@ p5.prototype.drawXAxis = function (length, arrowSize) {
  * @param {p5.Vector} V  the head of the vector
  * @param {boolean or list} dash False by default. Otherwise, it makes a dashed line with the sequence specified by a list
 */
-p5.prototype.drawVector = function (O_x, O_y, V, dash=false){
+p5.prototype.drawVector = function (O_x, O_y, V, dash = false) {
   // assume parameters are vectors
   push()
   if (dash != false) {
     drawingContext.setLineDash(dash);
   }
-  line(O_x, O_y, O_x+V.x, O_y+V.y);
+  line(O_x, O_y, O_x + V.x, O_y + V.y);
   noStroke();
   translate(O_x, O_y);
   rotate(V.heading());
-  translate(V.mag()-10, 0);
+  translate(V.mag() - 10, 0);
   triangle(0, 5, 0, -5, 10, 0);
   pop();
- }
+}
 
 /**
  * Keeps track of the mouse's current position taking transformations
@@ -353,26 +378,22 @@ p5.prototype.drawVector = function (O_x, O_y, V, dash=false){
  *
  * @returns {Object} containing the mouse's x and y-coordinates
  */
+
+
+
 p5.prototype.mouse = function () {
-  const m = {};
-  if (this._coordinateMode === this.RIGHT_HAND) {
-    m.x = this.mouseX;
-    m.y = this.height - this.mouseY;
-  } else {
-    m.x = this.mouseX;
-    m.y = this.mouseY;
+
+  const transform_matrix = this.drawingContext.getTransform();
+
+  const m = {
+    x: this.mouseX - transform_matrix.e,
+    y: this.mouseY - transform_matrix.f
   }
 
-  const tm = {};
-  const inverse = math.inv(this._basisMatrix);
-  tm.x =
-    m.x * inverse.get([0, 0]) +
-    m.y * inverse.get([1, 0]) +
-    1 * inverse.get([2, 0]);
-  tm.y =
-    m.x * inverse.get([0, 1]) +
-    m.y * inverse.get([1, 1]) +
-    1 * inverse.get([2, 1]);
+  const tm = {
+    x: m.x * transform_matrix.a + m.y * transform_matrix.c,
+    y: m.x * transform_matrix.b + m.y * transform_matrix.d
+  }
 
   return tm;
 };
@@ -566,8 +587,9 @@ p5.prototype.die = function (
  * @param {Number} barScale the scale factor from data values to bar height (Optional)
  */
 p5.prototype.drawBarGraph = function (data, labels, width, height, barScale) {
-  const ox = this._basisMatrix.get([2, 0]);
-  const oy = this._basisMatrix.get([2, 1]);
+  const transform_matrix = this.drawingContext.getTransform();
+  const ox = transform_matrix.e;
+  const oy = transform_matrix.f;
   let _width;
   if (!width) {
     _width = this.width - ox - 16;
@@ -598,12 +620,12 @@ p5.prototype.drawBarGraph = function (data, labels, width, height, barScale) {
     if (labels) {
       for (let i = 0; i < data.length; i += 1) {
         let x = barWidth + 2 * i * barWidth;
-        this.text(labels[i], x, -this.textSize());
+        this.striveText(labels[i], x, -this.textSize());
       }
     } else {
       for (let i = 0; i < data.length; i += 1) {
         let x = barWidth + 2 * i * barWidth;
-        this.text(i + 1, x, -this.textSize());
+        this.striveText(i + 1, x, -this.textSize());
       }
     }
   }

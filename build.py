@@ -6,7 +6,7 @@ def concat(files):
   package = ''
   for fn in files:
     path = os.path.join(os.getcwd(), fn)
-    with open(path) as f:
+    with open(path, encoding="utf8") as f:
       for line in f:
         package += line
     package += '\n'
@@ -14,7 +14,7 @@ def concat(files):
 
 
 def write(package, filename):
-  with open(filename, 'w') as f:
+  with open(filename, 'w', encoding="utf8") as f:
     f.write(package)
 
 
@@ -26,16 +26,16 @@ def copy_map(filename):
 
 if __name__ == '__main__':
   files = [
-    'lib/p5.js',
-    'lib/math.js',
-    'src/p5.strive.js',
-    'lib/skulpt.min.js',
-    'lib/skulpt-stdlib.js',
-    'lib/jquery-3.5.1.min.js',
-    'lib/skulptSetup.js'
+      # 'lib/p5.js',
+      'lib/math.js',
+      # 'src/p5.strive.js',
+      'lib/skulpt.min.js',
+      'lib/skulpt-stdlib.js',
+      'lib/jquery-3.5.1.min.js',
+      'lib/skulptSetup.js'
   ]
   package = concat(files)
-  filename = os.path.join(os.getcwd(), 'dist', 'strive-new.js')
+  filename = os.path.join(os.getcwd(), 'dist', 'p5skulpt.js')
   write(package, filename)
-  copy_map('p5.sound.min.js.map')
+  # copy_map('p5.sound.min.js.map')
   copy_map('skulpt.min.js.map')

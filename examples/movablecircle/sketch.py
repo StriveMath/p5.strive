@@ -14,6 +14,7 @@ def setup():
 def draw():
   background('black')
   translate(200, 200)
+  rotate(45)
   drawTickAxes()
 
   stroke('white')

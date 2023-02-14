@@ -6,10 +6,10 @@ def setup():
   loadFont('assets/PermanentMarker-Regular.ttf', 'font')
   loadSound('assets/pop.mp3', 'pop')
   loadImage('assets/ada.jpg', 'ada')
-  
+
 
 def draw():
-  image(assets['ada'], 0, 0)
+  striveImage(assets['ada'], 0, 0)
   drawBubble()
 
 
@@ -26,5 +26,5 @@ def drawBubble():
   textAlign(CENTER, CENTER)
   fill('black')
   noStroke()
-  text('Click to play!', 100, 275)
+  striveText('Click to play!', 100, 275)
   pop()
