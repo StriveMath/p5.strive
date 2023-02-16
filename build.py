@@ -18,8 +18,14 @@ def write(package, filename):
     f.write(package)
 
 
-def copy_map(filename):
+def copy_lib(filename):
   src = os.path.join(os.getcwd(), 'lib', filename)
+  dst = os.path.join(os.getcwd(), 'dist', filename)
+  shutil.copy(src, dst)
+
+
+def copy_src(filename):
+  src = os.path.join(os.getcwd(), 'src', filename)
   dst = os.path.join(os.getcwd(), 'dist', filename)
   shutil.copy(src, dst)
 
@@ -32,10 +38,16 @@ if __name__ == '__main__':
       'lib/skulpt.min.js',
       'lib/skulpt-stdlib.js',
       'lib/jquery-3.5.1.min.js',
-      'lib/skulptSetup.js'
+      'src/skulptSetup.js'
   ]
   package = concat(files)
   filename = os.path.join(os.getcwd(), 'dist', 'p5skulpt.js')
+
+  if (os.path.exists(filename)):
+    os.remove(filename)
   write(package, filename)
-  # copy_map('p5.sound.min.js.map')
-  copy_map('skulpt.min.js.map')
+
+  copy_src('p5.strive.js')
+  copy_lib('p5js\\p5.min.js')
+  copy_lib('p5js\\addons\\p5.sound.min.js')
+  # copy_lib('skulpt.min.js.map')

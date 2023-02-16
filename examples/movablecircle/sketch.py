@@ -2,6 +2,7 @@ from p5 import *
 
 
 def setup():
+  coordinateMode(BOTTOM_LEFT)
   createCanvas(400, 400)
   global p1, p2, p3
   p1 = createMovableCircle(50, 50, 15)

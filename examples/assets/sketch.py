@@ -2,14 +2,26 @@ from p5 import *
 
 
 def setup():
-  createCanvas(334, 334)
+  coordinateMode(BOTTOM_LEFT)
+  colorMode(1)
+  createCanvas(334 * 1.5, 334)
   loadFont('assets/PermanentMarker-Regular.ttf', 'font')
-  loadSound('assets/pop.mp3', 'pop')
   loadImage('assets/ada.jpg', 'ada')
+  loadSound('assets/pop.mp3', 'pop')
 
 
 def draw():
-  striveImage(assets['ada'], 0, 0)
+  image(assets['ada'], 0, 0)
+  image(assets['ada'],
+        assets['ada'].width, height / 2,
+        assets['ada'].width / 2, assets['ada'].height / 2
+        )
+  image(assets['ada'],
+        assets['ada'].width, assets['ada'].height / 4,
+        assets['ada'].width / 4, assets['ada'].height / 4,
+        assets['ada'].height / 2, assets['ada'].height / 2,
+        assets['ada'].width / 2, assets['ada'].height / 2
+        )
   drawBubble()
 
 
@@ -26,5 +38,5 @@ def drawBubble():
   textAlign(CENTER, CENTER)
   fill('black')
   noStroke()
-  striveText('Click to play!', 100, 275)
+  text('Click to play!', 100, 275)
   pop()

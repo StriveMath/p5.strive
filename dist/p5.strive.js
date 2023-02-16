@@ -55,9 +55,7 @@ p5.prototype.coordinateMode = function (mode) {
 
 p5.prototype._setCoordinateModeTopLeft = function () {
   this._coordinateMode = this.TOP_LEFT;
-  if (this._renderer.isP3D) {
-    // this.scale(1, -1);
-  } else {
+  if (!this._renderer.isP3D) {
     this.scale(1, -1);
     this.translate(0, -this.height);
   }
@@ -65,9 +63,7 @@ p5.prototype._setCoordinateModeTopLeft = function () {
 
 p5.prototype._setCoordinateModeBottomLeft = function () {
   this._coordinateMode = this.BOTTOM_LEFT;
-  if (this._renderer.isP3D) {
-    // this.scale(1, -1);
-  } else {
+  if (!this._renderer.isP3D) {
     this.translate(0, this.height);
     this.scale(1, -1);
   }
@@ -82,13 +78,6 @@ p5.prototype._applyCoordinateModeBeforeDraw = function () {
 }
 p5.prototype.registerMethod("pre", p5.prototype._applyCoordinateModeBeforeDraw);
 
-p5.prototype._camTinker = function () {
-  if (this._renderer.isP3D) {
-    const cam = this._renderer._curCamera;
-    cam.setPosition(cam.eyeX, cam.eyeY, cam.eyeZ);
-  }
-};
-p5.prototype.registerMethod("pre", p5.prototype._camTinker);
 
 // ====================================
 // Strive Extensions
@@ -97,6 +86,7 @@ p5.prototype.registerMethod("pre", p5.prototype._camTinker);
 p5.prototype._createCanvas = p5.prototype.createCanvas;
 p5.prototype.createCanvas = function () {
   this._createCanvas(...arguments);
+  this.resetMatrix();
   this._applyCoordinateModeBeforeDraw();
 }
 
@@ -133,55 +123,6 @@ p5.prototype.image = function (img, x, y, width, height, sx, sy, sWidth, sHeight
   } else {
     this._image(...arguments);
   }
-}
-
-p5.Element.prototype._position = p5.Element.prototype.position;
-p5.Element.prototype.position = function () {
-  if (this._coordinateMode === this.BOTTOM_LEFT) {
-    arguments[1] = this._pInst.height - arguments[1];
-    this._position(...arguments);
-  } else {
-    this._position(...arguments);
-  }
-}
-
-p5.prototype.__updateNextMouseCoords = p5.prototype._updateNextMouseCoords
-p5.prototype._updateNextMouseCoords = function (evt) {
-  if (this._coordinateMode === this.BOTTOM_LEFT) {
-    const _evt = new Proxy(evt, {
-      get: (target, prop) => {
-        // console.log(prop);
-        if (prop === "clientY")
-          return this.height - target[prop];
-        if (prop === "movementY")
-          return - target[prop]
-        return target[prop];
-      }
-    });
-    this.__updateNextMouseCoords(_evt);
-  } else {
-    this.__updateNextMouseCoords(...arguments);
-  }
-}
-
-p5.prototype._redraw = p5.prototype.redraw
-p5.prototype.redraw = function () {
-  if (!this.assetsLoaded()) {
-    return;
-  }
-
-  this._redraw(...arguments);
-}
-
-p5.prototype.bounce = function (maxNum, minNum, speed) {
-  const amp = maxNum - minNum
-  return Math.abs((this.frameCount * speed) % (2 * amp) - amp) + minNum
-}
-
-p5.prototype.wave = function (maxNum, minNum, speed) {
-  a = 1 / 2 * (maxNum - minNum)
-  b = 1 / 2 * (maxNum + minNum)
-  return a * Math.sin(this.frameCount * speed * 0.001 * Math.PI * 2) + b
 }
 
 /**
@@ -444,12 +385,18 @@ p5.prototype.mouse = function () {
     y: this.mouseY - transform_matrix.f,
   }
 
-  if (this._coordinateMode === this.BOTTOM_LEFT)
-    m.y = this.height - this.mouseY - transform_matrix.f;
+  if (this._coordinateMode === this.BOTTOM_LEFT) {
+    const tm = {
+      x: m.x * transform_matrix.a + m.y * transform_matrix.c,
+      y: m.x * transform_matrix.b + m.y * transform_matrix.d
+    }
+    return tm;
+  }
 
+  // doesn't work somehow
   const tm = {
-    x: m.x * transform_matrix.a + m.y * transform_matrix.b,
-    y: m.x * transform_matrix.c + m.y * transform_matrix.d
+    x: m.x * -transform_matrix.a + m.y * -transform_matrix.c,
+    y: m.x * -transform_matrix.b + m.y * -transform_matrix.d
   }
   return tm;
 };
@@ -772,8 +719,7 @@ p5.prototype._loadSound = p5.prototype.loadSound;
  */
 p5.prototype.loadSound = function (path, name) {
   this._assetsRemaining += 1;
-  this.assets[name] = this._loadSound(path, () => this._assetsRemaining--);
-  return this.assets[name];
+  this.assets[name] = this._loadSound(path);
 };
 
 // Alias for the loadImage() function
@@ -788,8 +734,7 @@ p5.prototype._loadImage = p5.prototype.loadImage;
  */
 p5.prototype.loadImage = function (path, name) {
   this._assetsRemaining += 1;
-  this.assets[name] = this._loadImage(path, () => this._assetsRemaining--);
-  return this.assets[name];
+  this.assets[name] = this._loadImage(path);
 };
 
 // Alias for the loadFont() function
@@ -809,7 +754,5 @@ p5.prototype.loadFont = function (path, name) {
     _path =
       "https://cdn.jsdelivr.net/gh/StriveMath/fonts/Press_Start_2P/PressStart2P-Regular.ttf";
   }
-  this.assets[name] = this._loadFont(_path, () => this._assetsRemaining--);
-  return this.assets[name];
+  this.assets[name] = this._loadFont(_path);
 };
-
