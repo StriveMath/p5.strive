@@ -179,9 +179,10 @@ p5.prototype.bounce = function (maxNum, minNum, speed) {
 }
 
 p5.prototype.wave = function (maxNum, minNum, speed) {
-  a = 1 / 2 * (maxNum - minNum)
-  b = 1 / 2 * (maxNum + minNum)
-  return a * Math.sin(this.frameCount * speed * 0.001 * Math.PI * 2) + b
+  const range = maxNum - minNum;
+  const a = 1 / 2 * (maxNum - minNum)
+  const b = 1 / 2 * (maxNum + minNum)
+  return a * Math.sin((this.frameCount * speed / range + 0.5) * Math.PI) + b
 }
 
 /**
