@@ -147,7 +147,7 @@ p5.Element.prototype.position = function () {
 
 p5.prototype.__updateNextMouseCoords = p5.prototype._updateNextMouseCoords
 p5.prototype._updateNextMouseCoords = function (evt) {
-  if (this._coordinateMode === this.BOTTOM_LEFT) {
+  if (this._coordinateMode === this.BOTTOM_LEFT && !this._renderer.isP3D) {
     const _evt = new Proxy(evt, {
       get: (target, prop) => {
         // console.log(prop);
