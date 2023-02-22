@@ -1,6 +1,0 @@
-The p5.strive Code of Conduct is an adaption of the p5.js Code of Conduct. It
-is licensed under the Creative Commons Attribution-ShareAlike 4.0 International
-License. 
-
-- http://p5js.org/community/
-- https://creativecommons.org/licenses/by-sa/4.0/

@@ -1,4 +1,0 @@
-The p5.strive library modifies and extends p5.js which is licensed under the
-LGPL 2.1.
-
-- https://github.com/processing/p5.js/blob/main/license.txt

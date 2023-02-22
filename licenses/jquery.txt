@@ -1,3 +1,0 @@
-The p5.strive library bundles jQuery which is licensed under the MIT License.
-
-- https://jquery.org/license/

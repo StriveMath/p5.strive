@@ -1,3 +1,0 @@
-The p5.strive library builds upon code from p5.computiful which is licensed under the MIT License.
-
-- https://github.com/mcintyrelabs/p5.computiful/blob/master/LICENSE
