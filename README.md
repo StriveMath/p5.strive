@@ -1,5 +1,7 @@
 # p5.strive
 
+> Note this has been deprecated in favor of [p5.learn.js](https://github.com/StriveMath/p5.learn.js).
+
 Welcome! 👋👋🏿👋🏽👋🏻👋🏾👋🏼
 
 p5.strive is an addon library for [p5.js](https://p5js.org) that turns the "software sketchbook" into an environment for teaching and learning mathematics. It adds a right-handed coordinate system, plotting, and a collection of virtual manipulatives -- all with a Python runtime.
